@@ -1,0 +1,90 @@
+﻿
+
+<div ng-app="app-test" ng-controller="testController as vm">
+    <table>
+            <td>
+                <div>Select an image file: <input type="file" id="fileInput" /></div>
+                <div class="cropArea">
+                    <ui-cropper image="myImage" area-type="rectangle" aspect-ratio="4.33" result-image="myCroppedImage" result-image-size='{w: 1300,h: 300}' init-max-area="true"></ui-cropper>
+                </div>
+            </td>
+            <td>
+                <div>Cropped Image:</div>
+                <div><img ng-src="{{myCroppedImage}}" /></div>
+            </td>
+        </table>
+
+ 
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+        var app = angular.module("app-test", ['ngSanitize', 'ngAnimate', 'ngTouch', 'uiCropper']);
+        //var app = angular.module("app-image-viewer", []);
+
+        app.controller("testController", function ($scope, $http, $timeout, $window) {
+            var vm = this;
+            $scope.myImage = '';
+            $scope.myCroppedImage = '';
+
+            var handleFileSelect = function (evt) {
+                var file = evt.currentTarget.files[0];
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    $scope.$apply(function ($scope) {
+                        $scope.myImage = evt.target.result;
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+            angular.element(document.querySelector('#fileInput')).on('change', handleFileSelect);
+
+            async function getThumbnailForVideo(videoUrl) {
+                const video = document.createElement("video");
+                const canvas = document.createElement("canvas");
+                video.style.display = "none";
+                canvas.style.display = "none";
+
+                // Trigger video load
+                await new Promise((resolve, reject) => {
+                    video.addEventListener("loadedmetadata", () => {
+                        video.width = video.videoWidth;
+                        video.height = video.videoHeight;
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        // Seek the video to 25%
+                        video.currentTime = video.duration * 0.25;
+                    });
+                    video.addEventListener("seeked", () => resolve());
+                    video.src = videoUrl;
+                });
+
+                // Draw the thumbnailz
+                canvas
+                    .getContext("2d")
+                    .drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                const imageUrl = canvas.toDataURL("image/png");
+                return imageUrl;
+            }
+
+
+
+
+            // Set up application
+            const img = document.querySelector("#img-thumb");
+            const fileInput = document.querySelector("#input-video-file");
+
+            fileInput.addEventListener("change", async e => {
+                const [file] = e.target.files;
+                const fileUrl = URL.createObjectURL(file);
+                const thumbUrl = await getThumbnailForVideo(fileUrl);
+                img.src = thumbUrl;
+            });
+
+        });</script>
+
+
+}

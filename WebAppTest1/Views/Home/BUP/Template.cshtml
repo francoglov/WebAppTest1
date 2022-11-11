@@ -1,0 +1,35 @@
+﻿
+
+<div ng-app="app-test" ng-controller="testController as vm">
+   
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+        var app = angular.module("app-test", ['ngSanitize', 'ngAnimate', 'ngTouch', 'uiCropper']);
+        //var app = angular.module("app-image-viewer", []);
+
+        app.controller("testController", function ($scope, $http, $timeout, $window) {
+            var vm = this;
+            $scope.myImage = '';
+            $scope.myCroppedImage = '';
+
+            var handleFileSelect = function (evt) {
+                var file = evt.currentTarget.files[0];
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    $scope.$apply(function ($scope) {
+                        $scope.myImage = evt.target.result;
+                    });
+                };
+                reader.readAsDataURL(file);
+            };
+            angular.element(document.querySelector('#fileInput')).on('change', handleFileSelect);
+
+        });</script>
+
+
+}
