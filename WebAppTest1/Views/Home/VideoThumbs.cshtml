@@ -5,7 +5,7 @@
         <label for="video Url">VideoURL:</label>
         <input type="text" id="videourl" name="videourl" ng-model="vm.videoUrl"><br><br>
     </div>
-
+    <button type="button" ng-click="getThumbnailForVideo(vm.videoUrl)">Get Thumbs</button>
     <div>
         <img src="{{vm.thumbs}}" alt="thumbs">
     </div>
